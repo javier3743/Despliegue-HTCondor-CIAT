@@ -1,0 +1,107 @@
+{% extends 'adminlte/base.html' %}
+{% load static %}
+{% block title %}Cluster Monitor{% endblock %}
+{% block body_class %} skin-green{% endblock %}
+
+{% block content %}
+
+    {% if servers %}
+        {% for server in servers %}
+            <div class="col-md-4">
+                <div class="box box-success box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ server.IP.Name}}</h3>
+                        {% if server.IsHtcondorMaster %}<img src="{% static "Master.png" %}" > {% endif %}
+                        {% if server.IsHtcondor %}<img src="{% static "Node.png" %}" > {% endif %}
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-info-sign"></i></button>
+                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="border: 1px solid #00a65a ; background: #00a65a; background-color :#00a65a">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">{{ server.IP.Name}}</h4>
+                                            {% if server.IsHtcondorMaster %}<img src="{% static "Master.png" %}" > {% endif %}
+                                            {% if server.IsHtcondor %}<img src="{% static "Node.png" %}" > {% endif %}
+                                        </div>
+                                        <div class="modal-body text-black"style="border: 1px solid #00a65a">
+                                            <h4>Average use in 1 minute: {{ server.AvgCpu1 }}</h4>
+                                            <h4>Average use in 5 minutes: {{ server.AvgCpu5 }}</h4>
+                                            <h4>Average use in 15 minutes: {{ server.AvgCpu15 }}</h4>
+                                            <h4>Model of CPU: {{ server.CpuName }}</h4>
+                                            <h4>Architecture: {{ server.Architecture }}</h4>
+                                            <h4>Total RAM: {{ server.RamTotal}}MB</h4>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="col-sm-6">
+                            <div class="chart easyPieChart" data-percent="{{ server.RamPercentage }}" style="width: 100px; height: 100px;">
+                                <div id="ram" class="percentage">
+                                    <label>{{ server.RamPercentage }}%</label>
+                                </div>
+                            </div>
+                            <figcaption style="width: 120px; text-align: center;font-size: large;font-weight: 700;">
+                                RAM</figcaption>
+
+                            <div id="avg1"class="col chart easyPieChart percentage" data-percent="{{ server.AvgCpu1 }}" style="width: 100px; height: 100px;">
+                                <label>{{ server.AvgCpu1 }}%</label>
+                            </div>
+                            <figcaption style="width: 120px; text-align: center;font-size: large;font-weight: 700;">
+                                Avg 1'</figcaption>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="chart easyPieChart" data-percent="{{ server.AvgCpu5 }}" style="width: 100px; height: 100px;">
+                                <div id="avg5" class="percentage" data-percent="20">
+                                    <label>{{ server.AvgCpu5 }}%</label>
+                                </div>
+                            </div>
+                            <figcaption style="width: 120px; text-align: center;font-size: large;font-weight: 700;">
+                                Avg 5'</figcaption>
+
+                            <div id="avg15"class="col chart easyPieChart percentage" data-percent="{{ server.AvgCpu15 }}" style="width: 100px; height: 100px;">
+                                <label>{{ server.AvgCpu15 }}%</label>
+                            </div>
+                            <figcaption style="width: 120px; text-align: center;font-size: large;font-weight: 700;">
+                                Avg 15'</figcaption>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif  %}
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.min.js"></script>
+    <script>
+        $(function () {
+            $('.chart').easyPieChart({
+                //your options goes here
+                size: 200
+            });
+        });
+    </script>
+    <script>
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').focus()
+        })
+    </script>
+{% endblock %}
+
+{% block stylesheets %}
+
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "easy.css" %}">
+
+{% endblock %}
+
+
+
